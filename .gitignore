@@ -1,0 +1,4 @@
+*.pyc
+sphinx_tosca.egg-info
+venv
+.eggs
