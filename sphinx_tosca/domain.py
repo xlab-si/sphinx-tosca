@@ -26,10 +26,10 @@ from sphinx.util.nodes import make_refnode
 
 
 SECTION_MAPPING = collections.OrderedDict((
-    ("parents", "Parents"),
+    ("parent", "Parent"),
     ("property", "Properties"),
     ("attribute", "Attributes"),
-    ("relationship", "Relationships"),
+    ("requirements", "Relationships"),
 ))
 
 ToscaObject = collections.namedtuple("ToscaObject", ("doc", "typ"))
@@ -73,7 +73,7 @@ def _group_fields(fields):
     return result
 
 
-class ToscaNodeType(Directive):
+class ToscaDirective(Directive):
 
     has_content = True
     required_arguments = 1
@@ -124,12 +124,16 @@ class ToscaNodeType(Directive):
         return [indexnode, description]
 
 
+class ToscaNodeType(ToscaDirective):
+    pass
+
+
+class ToscaRelationship(ToscaDirective):
+    pass
+
+
 class ToscaXRefRole(XRefRole):
     """ Cross-link TOSCA role. """
-
-    def __init__(self, object_type, **kwargs):
-        super(ToscaXRefRole, self).__init__(self, **kwargs)
-        self.object_type = object_type
 
     def process_link(self, env, refnode, has_explicit_title, title, target):
         return target, target
@@ -143,14 +147,17 @@ class ToscaDomain(Domain):
 
     object_types = {
         "node_type": ObjType("node_type", "node_type"),
+        "relationship": ObjType("relationship", "relationship"),
     }
 
     directives = {
         "node_type": ToscaNodeType,
+        "relationship": ToscaRelationship,
     }
 
     roles = {
-        "node_type": ToscaXRefRole("type"),
+        "node_type": ToscaXRefRole(),
+        "relationship": ToscaXRefRole(),
     }
 
     initial_data = {
